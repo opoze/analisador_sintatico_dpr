@@ -2,4 +2,6 @@ Analisador Sintático Descendente Preditivo Recursivo para linguagem DECAF.
 
 O objetivo é criar este analisador sintátivo para um programa escrito em linguagem DECAF, como trabalho avaliação para o Grau B da disciplina Tradutores do Curso Ciências da Computação da Unisinos.
 
+Não há restrições quanto a licença pois este código tem a finalidade para estudo acadêmico.
+
 
