@@ -1,0 +1,31 @@
+int qtdComandos = 4;
+string comandos[qtdComandos];
+
+comandos[0] = 'FRENTE 10';
+comandos[1] = 'TRAS 15';
+comandos[2] = 'FRENTE 5 ENTAO DIREITA 10';
+comandos[3] = 'ESQUERDA 10 APOS TRAS 15';
+
+
+def FRENTE(int n){
+
+}
+
+def TRAS(int n){
+
+}
+
+def ESQUERDA(int n){
+
+}
+
+def DIREITA(int n){
+
+}
+
+def void main(){
+
+  for(int i = 0; i <= qtdComandos; i++){
+
+  }
+}
