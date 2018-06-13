@@ -4,7 +4,7 @@
  * @Author: Luís Alberto Zagonel Pozenato
  * @Date:   2018-06-13 15:16:57
  * @Last Modified by:   Luís Alberto Zagonel Pozenato
- * @Last Modified time: 2018-06-13 15:22:15
+ * @Last Modified time: 2018-06-13 15:35:39
  */
 
 namespace App\Src;
@@ -44,7 +44,7 @@ class TokenizerDecaf
       'ReadInteger',
       'ReadLine',
       'new',
-      'NewArray'
+      'NewArray',
       'null',
       'intConstant',
       'doubleConstant',
@@ -160,9 +160,10 @@ class TokenizerDecaf
           if($token=='"'){
             $this->tkns[]['string'] = $string;
             $string = '';
+            $this->setContext('');
           }
           else{
-            $string.= ' '.$token;
+            $string .= ' '.$token;
           }
           continue;
         }
@@ -305,7 +306,7 @@ class TokenizerDecaf
         }
 
         else if ($next1 == '[' && $next2 != ']'){
-          $this->tkns[]['pointer_atrib'] = $token . '[]';
+          $this->tkns[]['ID'] = $token;
         }
 
         else if (filter_var($token, FILTER_VALIDATE_FLOAT) || $token == '0'){
