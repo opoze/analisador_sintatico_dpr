@@ -4,7 +4,7 @@
  * @Author: Luís Alberto Zagonel Pozenato
  * @Date:   2018-06-13 15:20:48
  * @Last Modified by:   Luís Alberto Zagonel Pozenato
- * @Last Modified time: 2018-06-13 16:47:50
+ * @Last Modified time: 2018-06-13 16:53:04
     
     L = 
     
@@ -63,7 +63,8 @@ class SyntaxAnaliser
   }
 
   public function start(){
-    $this->Program();    
+    $this->advance();
+    $this->Program();
   }
 
   public function setDebug($debug = false){
@@ -126,11 +127,11 @@ class SyntaxAnaliser
   private function error(){
     if($this->debug){echo '</br> in error';}
     
-    if($this->tok == ''){
-      if(isset($this->tokens[0]['token'])){
-        $tok = $this->tokens[0]['token'];
-      }
-    }
+    // if($this->tok == ''){
+    //   if(isset($this->tokens[0]['token'])){
+    //     $tok = $this->tokens[0]['token'];
+    //   }
+    // }
 
 
     echo '<br>';

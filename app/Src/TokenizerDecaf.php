@@ -4,7 +4,7 @@
  * @Author: Luís Alberto Zagonel Pozenato
  * @Date:   2018-06-13 15:16:57
  * @Last Modified by:   Luís Alberto Zagonel Pozenato
- * @Last Modified time: 2018-06-13 16:33:28
+ * @Last Modified time: 2018-06-13 16:52:55
  */
 
 namespace App\Src;
@@ -450,7 +450,6 @@ class TokenizerDecaf
 
         }
         else{
-          $this->tkns[]['ID'] = $token;
           $this->tkns[] = [
             'lexem' => 'ID',
             'token' => $token,
