@@ -17,7 +17,7 @@ Type            -> int Type1 | double Type1 | bool Type1 | string Type1 | ident 
 Type1           -> [] Type1
 FunctionDecla   -> Type ident ( Formals ) StmtBlock | void ident ( Formals ) StmtBlock
 Formals         -> Variable (, Variable)* | &
-ClassDecl       -> class ident (extentend ident)? (implements ident (,ident)*)* { Field* }
+ClassDecl       -> class ident (extend ident)? (implements ident (,ident)*)* { Field* }
 Field           -> VariableDecl | FunctionDecl
 InterfaceDecl   -> interface ident  { Prototype* }
 Prototype       -> Type ident (Formals) ; | void ident (Formals) ;
