@@ -11,45 +11,44 @@ class TokenizerDecaf
 
     private $tokens = [];
     private $eregs = null;
-    private $reservedWords = [];
     private $ids = [];
     private $currentId = [];
     private $context = '';
     private $lexemas = [];
     private $tkns = [];
 
-    // function __construct(){
-      $this->eregs = new Eregs();
-      $this->reservedWords = [
-        'int',
-        'double',
-        'bool',
-        'string',
-        'void',
-        'class',
-        'extend',
-        'implements',
-        'interface',
-        'if',
-        'else',
-        'while',
-        'for',
-        'return',
-        'break',
-        'print',
-        'this',
-        //'ReadInteger',
-        //'ReadLine',
-        'new',
-        //'NewArray'
-        'null',
-        'intConstant',
-        'doubleConstant',
-        'boolConstatnt',
-        'stringConstant'
-      ];
-    }
+    private $reservedWords = [
+      'int',
+      'double',
+      'bool',
+      'string',
+      'void',
+      'class',
+      'extend',
+      'implements',
+      'interface',
+      'if',
+      'else',
+      'while',
+      'for',
+      'return',
+      'break',
+      'print',
+      'this',
+      //'ReadInteger',
+      //'ReadLine',
+      'new',
+      //'NewArray'
+      'null',
+      'intConstant',
+      'doubleConstant',
+      'boolConstatnt',
+      'stringConstant'
+    ];
 
+    function __construct(){
+      $this->eregs = new Eregs();
+    }
 
     public function load($file = '') {
       try{
@@ -58,15 +57,17 @@ class TokenizerDecaf
       catch(Exception $e){
         return $e->getMessage();
       }
+
       if ($handle) {
           while (($line = fgets($handle)) !== false) {
               $this->proccessLine($line);
           }
           fclose($handle);
           $this->lexemas();
-      // } else {
-          return 'Error loading file';
+      } else {
+        return 'Error loading file';
       }
+      return $this->tkns;
     }
 
     private function proccessLine($line = ''){
@@ -137,7 +138,7 @@ class TokenizerDecaf
 
         // Somente para impressao na tela
         if($token=='##'){
-          echo '<br>';
+          //echo '<br>';
           continue;
         }
 
@@ -150,9 +151,8 @@ class TokenizerDecaf
         // Strings esto em mais de um token
         if($this->context == 'string'){
           if($token=='"'){
+            $this->tkns[]['string'] = $string;
             $string = '';
-            $this->tkns[]['string'] = $string
-
           }
           else{
             $string.= ' '.$token;
@@ -201,12 +201,10 @@ class TokenizerDecaf
 
         else if($token == '{'){
            $this->tkns[]['l_cbrace'] = $token;
-           $context++;
         }
 
         else if($token == '}'){
            $this->tkns[]['r_cbrace'] = $token;
-           $context--;
         }
 
         else if($token == '('){
@@ -320,20 +318,7 @@ class TokenizerDecaf
           }
 
         }
-
         else{
-          // if(isset($this->ids[$context.'_'.$token])){
-          //   $id = $this->ids[$context.'_'.$token];
-          // }
-          // else{
-          //   if(isset($this->currentId[$context])){
-          //     $id = $this->currentId[$context]++;
-          //   }
-          //   else{
-          //     $id = $this->currentId[$context]=1;
-          //   }
-          //   $this->ids[$context.'_'.$token] = $id;
-          // }
           $this->tkns[]['ID'] = $token;
         }
 

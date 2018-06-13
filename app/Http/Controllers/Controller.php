@@ -15,7 +15,7 @@ class Controller extends BaseController
 
     public function show(TokenizerDecaf $tokenizer) {
 
-      return $tokenizer->load('./code.txt');
+      return $tokenizer->load('./program.decaf');
 
     }
 }

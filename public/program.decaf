@@ -1,10 +1,10 @@
 int qtdComandos = 4;
 string comandos[qtdComandos];
 
-comandos[0] = 'FRENTE 10';
-comandos[1] = 'TRAS 15';
-comandos[2] = 'FRENTE 5 ENTAO DIREITA 10';
-comandos[3] = 'ESQUERDA 10 APOS TRAS 15';
+comandos[0] = "FRENTE 10";
+comandos[1] = "TRAS 15";
+comandos[2] = "FRENTE 5 ENTAO DIREITA 10";
+comandos[3] = "ESQUERDA 10 APOS TRAS 15";
 
 
 def FRENTE(int n){
