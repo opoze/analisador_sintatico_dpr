@@ -7,7 +7,9 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
+
 use App\Src\TokenizerDecaf;
+use App\Src\SyntaxAnaliser;
 
 class Controller extends BaseController
 {
@@ -15,7 +17,12 @@ class Controller extends BaseController
 
     public function show(TokenizerDecaf $tokenizer) {
 
-      var_dump($tokenizer->load('./program.decaf'));
+      $tokens = $tokenizer->load('./program.decaf');
+
+      $syntaxAnaliser = new SyntaxAnaliser($tokens);
+      $syntaxAnaliser->setDebug(true);
+      $syntaxAnaliser->setDebug(true);
+      $syntaxAnaliser->start();
 
     }
 }

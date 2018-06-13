@@ -4,7 +4,7 @@
  * @Author: Luís Alberto Zagonel Pozenato
  * @Date:   2018-06-13 15:20:48
  * @Last Modified by:   Luís Alberto Zagonel Pozenato
- * @Last Modified time: 2018-06-13 15:22:04
+ * @Last Modified time: 2018-06-13 16:47:50
     
     L = 
     
@@ -44,24 +44,52 @@ namespace App\Src;
 
 use Exception;
 
-class Semantic
+class SyntaxAnaliser
 {
+
   // Variável global que armazena o token lido
   private $tok = '';
   private $lexem = '';
   private $tokens = [];
   private $indice = -1;
+  private $debug = false;
+  private $line = 0;
+  private $column = 0;
+
+
+  function __construct($tokens = [], $debug = false){
+    $this->setTokens($tokens);
+    $this->debug = $debug;
+  }
+
+  public function start(){
+    $this->Program();    
+  }
+
+  public function setDebug($debug = false){
+    $this->debug = $debug;
+  }
+
+  private function Program(){
+    if($this->debug){echo '</br> in Program';}
+    do{
+      $this->Decl();
+    }
+    while($this->tok != '');
+  }
 
   private function setTokens($tokens = []){
     $this->tokens = $tokens;
   }
 
   private function advance() {
-    // token -> lexem;
+    if($this->debug){echo '</br> in advance';}
     $tok = $this->getToken();
     if(is_array($tok)){
-      $this->lexem = key($tok);
-      $this->tok = $tok[$this->lexem];
+      $this->lexem = $tok['lexem'];
+      $this->tok = $tok['token'];
+      $this->line = $tok['line'];
+      $this->column = '0';
     }
     else{
       $this->tok = '';
@@ -69,6 +97,7 @@ class Semantic
   }
 
   private function getToken(){
+    if($this->debug){echo '</br> in getToken';}
     $this->indice++;
     if(isset($this->tokens[$this->indice])){
       return $this->tokens[$this->indice];
@@ -77,6 +106,7 @@ class Semantic
   }
 
   private function consume($t){
+    if($this->debug){echo '</br> in consume';}
     // Cosome token ID
     if($t == 'ID') {
       if(key($this->tok)){
@@ -94,10 +124,25 @@ class Semantic
   }
 
   private function error(){
-    // throw exception
+    if($this->debug){echo '</br> in error';}
+    
+    if($this->tok == ''){
+      if(isset($this->tokens[0]['token'])){
+        $tok = $this->tokens[0]['token'];
+      }
+    }
+
+
+    echo '<br>';
+    echo 'Synax Error ';
+    echo 'Unexpected token: \''. $tok . '\' ';
+    echo 'in line: \''. $this->line. '\' column: \'' . $this->column . '\'';
+
+    exit();
   }
 
   private function Type() {
+    if($this->debug){echo '</br> in Type';}
     switch($this->tok){
       case 'int': {
         $this->consume('int');
@@ -128,6 +173,7 @@ class Semantic
   }
 
   private function Type1() {
+    if($this->debug){echo '</br> in Type1';}
     switch ($this->tok) {
       case '[': {
         $this->consume('['); $this->consume(']'); $this->Type1();
@@ -142,24 +188,27 @@ class Semantic
   }
 
   private function Variable() {
+    if($this->debug){echo '</br> in Variable';}
     $this->Type(); $this->consume('ID');
   }
 
   private function VariableDecl() {
+    if($this->debug){echo '</br> in VariableDecl';}
     $this->Variable(); $this->consume(';');
   }
 
   private function Decl() {
+    if($this->debug){echo '</br> in Decl';}
     if($this->isClassDecl()){
       $this->ClassDecl();
     }
     else if($this->isInterfaceDecl()){
       $this->InterfaceDecl();
     }
-    else if(isFunctionDecl()){
+    else if($this->isFunctionDecl()){
       $this->FunctionDecl();
     }
-    else if(isVariableDecl()){
+    else if($this->isVariableDecl()){
       $this->VariableDecl();
     }
     else{
@@ -167,14 +216,8 @@ class Semantic
     }
   }
 
-  public function Program(){
-    do{
-      $this->Decl();
-    }
-    while($this->tok != '');
-  }
-
   private function FunctionDecl(){
+    if($this->debug){echo '</br> in FunctionDecl';}
     if ($this->tok == 'void'){
       $this->consume('void');
       $this->consume('ID');
@@ -183,7 +226,7 @@ class Semantic
       $this->consume(')');
       $this->StmtBlock();
     }
-    else (){
+    else {
       $this->Type();
       $this->consume('ID');
       $this->consume('(');
@@ -194,6 +237,7 @@ class Semantic
   }
 
   private function Formals(){
+    if($this->debug){echo '</br> in Formals';}
     if($this->Type()){
       $this->Variable();
       $out = false;
@@ -212,6 +256,7 @@ class Semantic
 
 
   private function ClassDecl() {
+    if($this->debug){echo '</br> in ClassDecl';}
     if ($this->isClassDecl()) {
       $this->consume('class');
       $this->consume('ID');
@@ -267,6 +312,7 @@ class Semantic
   }
 
   private function Field() {
+    if($this->debug){echo '</br> in Field';}
     if ($this->isVariableDecl()){
       $this->VariableDecl();
     }
@@ -279,6 +325,7 @@ class Semantic
   }
 
   private function InterfaceDecl(){
+    if($this->debug){echo '</br> in InterfaceDecl';}
     if ($this->isInterfaceDecl()){
       $this->consume('interface');
       $this->consume('ID');
@@ -301,6 +348,7 @@ class Semantic
   }
 
   private function Prototype(){
+    if($this->debug){echo '</br> in Prototype';}
     if($this->tok == 'void'){
       $this->consume('void');
       $this->consume('ID');
@@ -320,6 +368,7 @@ class Semantic
   }
 
   private function StmtBlock(){
+    if($this->debug){echo '</br> in StmtBlock';}
     $this->consume('{');
     $out = false;
     //  0 ou N VariableDecl
@@ -345,6 +394,7 @@ class Semantic
   }
 
   private function Stmt(){
+    if($this->debug){echo '</br> in Stmt';}
     switch($this->tok){
       case 'if': {
         $this->IfStmt();
@@ -388,6 +438,7 @@ class Semantic
   }
 
   private function IfStmt(){
+    if($this->debug){echo '</br> in IfStmt';}
     $this->consume('if');
     $this->consume('(');
     $this->Expr();
@@ -407,6 +458,7 @@ class Semantic
   }
 
   private function WhileStmt(){
+    if($this->debug){echo '</br> in WhileStmt';}
     $this->consume('while');
     $this->consume('(');
     $this->Expr();
@@ -415,6 +467,7 @@ class Semantic
   }
 
   private function ForStmt(){
+    if($this->debug){echo '</br> in ForStmt';}
     $this->consume('for');
     $this->consume('(');
     // 0 ou 1 Expr
@@ -429,16 +482,19 @@ class Semantic
   }
 
   private function ReturnStmt() {
+    if($this->debug){echo '</br> in ReturnStmt';}
     $this->consume('return');
     // 0 ou 1 Expr
     if($this->isExpr()){ $this->Expr(); }
   }
 
   private function BreakStmt() {
+    if($this->debug){echo '</br> in BreakStmt';}
     $this->consume('break');
   }
 
   private function PrinsStmt(){
+    if($this->debug){echo '</br> in PrinsStmt';}
     $this->consume('print');
     $this->consume('(');
     // 0 ou N Expr
@@ -455,6 +511,7 @@ class Semantic
   }
 
   private function Expr(){
+    if($this->debug){echo '</br> in Expr';}
     switch($this->tok){
       case 'Constant': {
         $this->consume('Constant');
@@ -532,6 +589,7 @@ class Semantic
   }
 
   private function F1(){
+    if($this->debug){echo '</br> in F1';}
     if($this->tok == '='){
       $this->consume('=');
       $this->Expr();
@@ -543,6 +601,7 @@ class Semantic
   }
 
   private function Expr1(){
+    if($this->debug){echo '</br> in Expr1';}
     switch ($this->tok) {
       case '+':{
         $this->consume('+');
@@ -630,6 +689,7 @@ class Semantic
   }
 
   private function LValue(){
+    if($this->debug){echo '</br> in LValue';}
     if($this->lexem == 'ID'){
       $this->consume('ID');
     }
@@ -640,6 +700,7 @@ class Semantic
   }
 
   private function F2(){
+    if($this->debug){echo '</br> in F2';}
     switch ($this->tok) {
       case '.': {
         $this->consume('.');
@@ -660,6 +721,7 @@ class Semantic
   }
 
   private function Call(){
+    if($this->debug){echo '</br> in Call';}
     if($this->lexem == 'ID'){
       $this->consume('ID');
       $this->consume('(');
@@ -679,6 +741,7 @@ class Semantic
   }
 
   private function Actuals(){
+    if($this->debug){echo '</br> in Actuals';}
     if($this->isExpr){
       $this->Expr();
       $out = false;
@@ -696,6 +759,7 @@ class Semantic
   }
 
   private function Constant(){
+    if($this->debug){echo '</br> in Constant';}
     switch($this->tok){
       case 'intConstant': {
         $this->consume('intConstant');
@@ -726,6 +790,7 @@ class Semantic
 
   //  HELPERS
   private function isType() {
+    if($this->debug){echo '</br> in isType';}
     return (
       $this->tok == 'int' ||
       $this->tok == 'double' ||
@@ -736,6 +801,7 @@ class Semantic
   }
 
   private function isFunctionDecl() {
+    if($this->debug){echo '</br> in isFunctionDecl';}
     $is = false;
     if ($this->isType() || $this->tok == 'void'){
       $indice = $this->indice + 2; // Token 2 a frente;
@@ -749,18 +815,22 @@ class Semantic
   }
 
   private function isPrototype(){
+    if($this->debug){echo '</br> in isPrototype';}
     return $this->isFunctionDecl();
   }
 
   private function isClassDecl() {
+    if($this->debug){echo '</br> in isClassDecl';}
     return $this->tok == 'class';
   }
 
   private function isVariableDecl(){
-    return $this->isVariableDecl();
+    if($this->debug){echo '</br> in isVariableDecl';}
+    return $this->isVariable();
   }
 
   private function isVariable() {
+    if($this->debug){echo '</br> in isVariable';}
     $is = false;
     if ($this->isType()){
       $indice = $this->indice + 2; // Token 2 a frente;
@@ -774,39 +844,48 @@ class Semantic
   }
 
   private function isInterfaceDecl() {
+    if($this->debug){echo '</br> in isInterfaceDecl';}
     return $this->tok == 'interface';
   }
 
   private function isIfStmt(){
+    if($this->debug){echo '</br> in isIfStmt';}
     return $this->tok == 'if';
   }
 
   private function isWhileStmt(){
+    if($this->debug){echo '</br> in isWhileStmt';}
     return $this->tok == 'while';
   }
 
   private function isForStmt(){
+    if($this->debug){echo '</br> in isForStmt';}
     return $this->tok == 'for';
   }
 
   private function isReturnStmt(){
+    if($this->debug){echo '</br> in isReturnStmt';}
     return $this->tok == 'return';
   }
 
   private function isBreakStmt(){
+    if($this->debug){echo '</br> in isBreakStmt';}
     return $this->tok == 'break';
   }
 
   private function isStmtBlock(){
-    return $this->token == '{'
+    if($this->debug){echo '</br> in isStmtBlock';}
+    return $this->token == '{';
   }
 
   private function isPrintStmt(){
+    if($this->debug){echo '</br> in isPrintStmt';}
     return $this->tok == 'print';
   }
 
   private function isStmt(){
-    if(
+    if($this->debug){echo '</br> in isStmt';}
+    return (
       $this->isIfStmt() ||
       $this->isWhileStmt() ||
       $this->isForStmt() ||
@@ -815,10 +894,11 @@ class Semantic
       $this->isPrintStmt() ||
       $this->isExpr() || // Duvida na interrogacao Expr?
       $this->isStmtBlock()
-    )
+    );
   }
 
   private function isExpr(){
+    if($this->debug){echo '</br> in isExpr';}
     return (
       $this->tok == 'Constant' ||
       $this->tok == 'Call' ||
@@ -835,7 +915,8 @@ class Semantic
   }
 
   private function isLValue(){
-    return($this->lexem == 'ID' || $this->isExpr));
+    if($this->debug){echo '</br> in isLValue';}
+    return($this->lexem == 'ID' || $this->isExpr);
   }
 
 

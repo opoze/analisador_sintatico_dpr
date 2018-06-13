@@ -7,23 +7,23 @@ comandos[2] = "FRENTE 5 ENTAO DIREITA 10";
 comandos[3] = "ESQUERDA 10 APOS TRAS 15";
 
 
-def FRENTE(int n){
+FRENTE(int n){
 
 }
 
-def TRAS(int n){
+TRAS(int n){
 
 }
 
-def ESQUERDA(int n){
+ESQUERDA(int n){
 
 }
 
-def DIREITA(int n){
+DIREITA(int n){
 
 }
 
-def void main(){
+void main(){
 
   for(int i = 0; i <= qtdComandos; i++){
 
