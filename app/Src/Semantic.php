@@ -1,37 +1,46 @@
 <?php
 
+/**
+ * @Author: Luís Alberto Zagonel Pozenato
+ * @Date:   2018-06-13 15:20:48
+ * @Last Modified by:   Luís Alberto Zagonel Pozenato
+ * @Last Modified time: 2018-06-13 15:22:04
+    
+    L = 
+    
+    Progam          -> Decl+
+    Decl            -> VariableDecl | FunctionDecl | ClassDecl | InterfaceDecl
+    VariableDecl    -> Variable;
+    Variable        -> Type ident
+    Type            -> int Type1 | double Type1 | bool Type1 | string Type1 | ident Type1
+    Type1           -> [] Type1
+    FunctionDecla   -> Type ident ( Formals ) StmtBlock | void ident ( Formals ) StmtBlock
+    Formals         -> Variable (, Variable)* | &
+    ClassDecl       -> class ident (extentend ident)? (implements ident (,ident)*)* { Field* }
+    Field           -> VariableDecl | FunctionDecl
+    InterfaceDecl   -> interface ident  { Prototype* }
+    Prototype       -> Type ident (Formals) ; | void ident (Formals) ;
+    StmtBlock       -> { VariableDecl* Stmt* }
+    Stmt            -> Expr? | IfStmt | WhileStmt | ForStmt | BreakStmt | ReturnStmt | PrintStmt | StmtBlock
+    IfStmt          -> if (Expr) Stmt (else Stmt)*
+    WhileStmt       -> while (Expr) StmtBlock
+    ForStmt         -> for (Expr?; Expr; Expr?) Stmt
+    ReturnStmt      -> return Expr?
+    BreakStmt       -> break
+    PrintStmt       -> print(Expr*)
+    Expr            -> LValue F1 | Constant Expr1 | this Expr1 | Call Expr1 | (Expr) Expr1 | -Expr Expr1 | !Expr Expr1 | ReadInteger() Expr1 | ReadLine() Expr1 | new ident Expr1 | NewArray (Expr, Type) Expr1
+    F1              -> = Expr Expr1 | Expr1
+    Expr1           -> + Expr  Expr1 | - Expr  Expr1 | * Expr  Expr1 | / Expr  Expr1 | % Expr  Expr1 | < Expr  Expr1 |  <= Expr  Expr1 | > Expr  Expr1 | >= Expr  Expr1 | == Expr  Expr1 | != Expr  Expr1 | && Expr Expr1 | || Expr Expr1
+    LValue          -> ident | Expr F2 | Expr F2
+    F2              -> .ident | [Expr]
+    Call            -> ident ( Actuals ) | Expr .ident | ( Actuals )
+    Actuals         -> Expr (, Expr )* | &
+    Constant        -> IntConstant | doubleConstant | boolConstatnt | stringConstant | null
+
+ */
+
+
 namespace App\Src;
-
-
-// Progam          -> Decl+
-// Decl            -> VariableDecl | FunctionDecl | ClassDecl | InterfaceDecl
-// VariableDecl    -> Variable;
-// Variable        -> Type ident
-// Type            -> int Type1 | double Type1 | bool Type1 | string Type1 | ident Type1
-// Type1           -> [] Type1
-// FunctionDecla   -> Type ident ( Formals ) StmtBlock | void ident ( Formals ) StmtBlock
-// Formals         -> Variable (, Variable)* | &
-// ClassDecl       -> class ident (extentend ident)? (implements ident (,ident)*)* { Field* }
-// Field           -> VariableDecl | FunctionDecl
-// InterfaceDecl   -> interface ident  { Prototype* }
-// Prototype       -> Type ident (Formals) ; | void ident (Formals) ;
-// StmtBlock       -> { VariableDecl* Stmt* }
-// Stmt            -> Expr? | IfStmt | WhileStmt | ForStmt | BreakStmt | ReturnStmt | PrintStmt | StmtBlock
-// IfStmt          -> if (Expr) Stmt (else Stmt)*
-// WhileStmt       -> while (Expr) StmtBlock
-// ForStmt         -> for (Expr?; Expr; Expr?) Stmt
-// ReturnStmt      -> return Expr?
-// BreakStmt       -> break
-// PrintStmt       -> print(Expr*)
-// Expr            -> LValue F1 | Constant Expr1 | this Expr1 | Call Expr1 | (Expr) Expr1 | -Expr Expr1 | !Expr Expr1 | ReadInteger() Expr1 | ReadLine() Expr1 | new ident Expr1 | NewArray (Expr, Type) Expr1
-// F1              -> = Expr Expr1 | Expr1
-// Expr1           -> + Expr  Expr1 | - Expr  Expr1 | * Expr  Expr1 | / Expr  Expr1 | % Expr  Expr1 | < Expr  Expr1 |  <= Expr  Expr1 | > Expr  Expr1 | >= Expr  Expr1 | == Expr  Expr1 | != Expr  Expr1 | && Expr Expr1 | || Expr Expr1
-// LValue          -> ident | Expr F2 | Expr F2
-// F2              -> .ident | [Expr]
-// Call            -> ident ( Actuals ) | Expr .ident | ( Actuals )
-// Actuals         -> Expr (, Expr )* | &
-// Constant        -> IntConstant | doubleConstant | boolConstatnt | stringConstant | null
-
 
 use Exception;
 
@@ -90,24 +99,30 @@ class Semantic
 
   private function Type() {
     switch($this->tok){
-      case: 'int' {
-        $this->consume('int') ; $this->Type1();
+      case 'int': {
+        $this->consume('int');
+        $this->Type1();
         break;
       }
-      case: 'double' {
-        $this->consume('double') ; $this->Type1();
+      case 'double': {
+        $this->consume('double');
+        $this->Type1();
         break;
       }
-      case: 'bool' {
-        $this->consume('bool') ; $this->Type1();
-        break;
-      }
-      case: 'ID' {
-        $this->consume('ID') ; $this->Type1();
+      case 'bool': {
+        $this->consume('bool');
+        $this->Type1();
         break;
       }
       default: {
-        $this->error();
+        if($this->lexem == 'ID'){
+          $this->consume('ID');
+          $this->Type1();
+        }
+        else{
+          $this->error();
+        }
+        break;
       }
     }
   }
@@ -121,6 +136,7 @@ class Semantic
       default: {
         // pode ser VAZIO
         // $this->error();
+        break;
       }
     }
   }
@@ -178,17 +194,20 @@ class Semantic
   }
 
   private function Formals(){
-    $this->Variable();
-    $out = false;
-    while(!$out) {
-      if($this->tok == ','){
-        $this->consume(',');
-        $this->Variable();
-      }
-      else{
-        $out = true;
+    if($this->Type()){
+      $this->Variable();
+      $out = false;
+      while(!$out) {
+        if($this->tok == ','){
+          $this->consume(',');
+          $this->Variable();
+        }
+        else{
+          $out = true;
+        }
       }
     }
+    // pode ser VAZIO, por isso não gera erro
   }
 
 
@@ -359,11 +378,354 @@ class Semantic
         $this->StmtBlock();
         break;
       }
+      default: {
+        if($this->isExpr()){
+          $this->Expr();
+        }
+        break;
+      }
     }
   }
 
+  private function IfStmt(){
+    $this->consume('if');
+    $this->consume('(');
+    $this->Expr();
+    $this->consume(')');
+    $this->Stmt();
+
+    // 0 ou N Else
+    $out = false;
+    while(!$out){
+      if($this->token == 'else'){
+        $this->Stmt();
+      }
+      else{
+        $out = true;
+      }
+    }
+  }
+
+  private function WhileStmt(){
+    $this->consume('while');
+    $this->consume('(');
+    $this->Expr();
+    $this->consume(')');
+    $this->StmtBlock();
+  }
+
+  private function ForStmt(){
+    $this->consume('for');
+    $this->consume('(');
+    // 0 ou 1 Expr
+    if($this->isExpr()){ $this->Expr(); }
+    $this->consume(';');
+    $this->Expr();
+    $this->consume(';');
+    // 0 ou 1 Expr
+    if($this->isExpr()){ $this->Expr(); }
+    $this->consume(')');
+    $this->Stmt();
+  }
+
+  private function ReturnStmt() {
+    $this->consume('return');
+    // 0 ou 1 Expr
+    if($this->isExpr()){ $this->Expr(); }
+  }
+
+  private function BreakStmt() {
+    $this->consume('break');
+  }
+
+  private function PrinsStmt(){
+    $this->consume('print');
+    $this->consume('(');
+    // 0 ou N Expr
+    $out = false;
+    while(!$out){
+      if($this->isExpr()){
+        $this->Expr();
+      }
+      else{
+        $out = true;
+      }
+    }
+    $this->consume(')');
+  }
+
+  private function Expr(){
+    switch($this->tok){
+      case 'Constant': {
+        $this->consume('Constant');
+        $this->Expr1();
+        break;
+      }
+      case 'this': {
+        $this->consume('this');
+        $this->Expr1();
+        break;
+      }
+      case 'Call': {
+        $this->consume('Call');
+        $this->Expr1();
+        break;
+      }
+      case '(': {
+        $this->consume('(');
+        $this->Expr();
+        $this->consume(')');
+        $this->Expr1();
+        break;
+      }
+      case '-': {
+        $this->consume('-');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '!': {
+        $this->consume('!');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case 'ReadInteger': {
+        $this->consume('ReadInteger');
+        $this->consume('(');
+        $this->consume(')');
+        $this->Expr1();
+        break;
+      }
+      case 'ReadLine': {
+        $this->consume('ReadLine');
+        $this->consume('(');
+        $this->consume(')');
+        $this->Expr1();
+        break;
+      }
+      case 'new': {
+        $this->consume('ID');
+        $this->Expr1();
+        break;
+      }
+      case 'NewArray': {
+        $this->consume('NewArray');
+        $this->consume('(');
+        $this->Expr();
+        $this->Type();
+        $this->consume(')');
+        $this->Expr1();
+        break;
+      }
+      default: {
+        if($this->isLValue()){
+          $this->LValue();
+          $this->F1();
+        }
+        else{
+          $this->error();
+        }
+        break;
+      }
+    }
+  }
+
+  private function F1(){
+    if($this->tok == '='){
+      $this->consume('=');
+      $this->Expr();
+      $this->Expr1();
+    }
+    else{
+      $this->Expr1();
+    }
+  }
+
+  private function Expr1(){
+    switch ($this->tok) {
+      case '+':{
+        $this->consume('+');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '-':{
+        $this->consume('-');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '*':{
+        $this->consume('*');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '/':{
+        $this->consume('/');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '%':{
+        $this->consume('%');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '<':{
+        $this->consume('<');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '<=':{
+        $this->consume('<=');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '>':{
+        $this->consume('>');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '>=':{
+        $this->consume('>=');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '==':{
+        $this->consume('==');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '!=':{
+        $this->consume('!=');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '&&':{
+        $this->consume('&&');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      case '||':{
+        $this->consume('||');
+        $this->Expr();
+        $this->Expr1();
+        break;
+      }
+      default:{
+        $this->error();
+        break;
+      }
+    }
+  }
+
+  private function LValue(){
+    if($this->lexem == 'ID'){
+      $this->consume('ID');
+    }
+    else{
+      $this->Expr();
+      $this->F2();
+    }
+  }
+
+  private function F2(){
+    switch ($this->tok) {
+      case '.': {
+        $this->consume('.');
+        $this->consume('ID');
+        break;
+      }
+      case '[': {
+        $this->consume('[');
+        $this->Expr();
+        $this->consume(']');
+        break;
+      }
+      default: {
+        $this->error();        
+        break;
+      }
+    }
+  }
+
+  private function Call(){
+    if($this->lexem == 'ID'){
+      $this->consume('ID');
+      $this->consume('(');
+      $this->Actuals();
+      $this->consume(')');
+    }
+    else if ($this->token == '('){
+      $this->Expr();
+      $this->consume('.');
+      $this->consume('ID');
+    }
+    else{
+      $this->consume('(');
+      $this->Actuals();
+      $this->consume(')');
+    }
+  }
+
+  private function Actuals(){
+    if($this->isExpr){
+      $this->Expr();
+      $out = false;
+      while(!$out) {
+        if($this->tok == ','){
+          $this->consume(',');
+          $this->Expr();
+        }
+        else{
+          $out = true;
+        }
+      }
+    }
+    // pode ser VAZIO então não da erro caso não seja Expr
+  }
+
+  private function Constant(){
+    switch($this->tok){
+      case 'intConstant': {
+        $this->consume('intConstant');
+        break;
+      }
+      case 'boolConstant': {
+        $this->consume('boolConstant');
+        break;
+      }
+      case 'doubleConstant': {
+        $this->consume('doubleConstant');
+        break;
+      }
+      case 'stringConstant': {
+        $this->consume('stringConstant');
+        break;
+      }
+      case 'null': {
+        $this->consume('null');
+        break;
+      }
+      default: {
+        $this->error();
+      }
+    }
+  }
+
+
   //  HELPERS
-  private isType() {
+  private function isType() {
     return (
       $this->tok == 'int' ||
       $this->tok == 'double' ||
@@ -394,7 +756,11 @@ class Semantic
     return $this->tok == 'class';
   }
 
-  private function isVariableDecl() {
+  private function isVariableDecl(){
+    return $this->isVariableDecl();
+  }
+
+  private function isVariable() {
     $is = false;
     if ($this->isType()){
       $indice = $this->indice + 2; // Token 2 a frente;
@@ -431,15 +797,15 @@ class Semantic
     return $this->tok == 'break';
   }
 
+  private function isStmtBlock(){
+    return $this->token == '{'
+  }
+
   private function isPrintStmt(){
     return $this->tok == 'print';
   }
 
-  private function isExpr(){
-    return true;
-  }
-
-  private function isStmtBlock(){
+  private function isStmt(){
     if(
       $this->isIfStmt() ||
       $this->isWhileStmt() ||
@@ -447,13 +813,13 @@ class Semantic
       $this->isBreakStmt() ||
       $this->isReturnStmt() ||
       $this->isPrintStmt() ||
-      $this->isPrintStmt() ||
-      $this->tok == '{'
+      $this->isExpr() || // Duvida na interrogacao Expr?
+      $this->isStmtBlock()
     )
   }
 
   private function isExpr(){
-    if(
+    return (
       $this->tok == 'Constant' ||
       $this->tok == 'Call' ||
       $this->tok == 'this' ||
@@ -464,14 +830,13 @@ class Semantic
       $this->tok == 'new' ||
       $this->tok == 'NewArray' ||
       $this->tok == '(' ||
-    )
-  Expr            -> LValue F1
+      $this->lexem == 'ID'
+    );
   }
 
   private function isLValue(){
-
+    return($this->lexem == 'ID' || $this->isExpr));
   }
-
 
 
 }

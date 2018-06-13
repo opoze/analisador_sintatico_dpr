@@ -9,18 +9,18 @@ Remover Recurção a esquerda para tornar a linguagem e fatorar a linguagem para
 
 Linguagem LL(1)
 
-#Progam          -> Decl+
-#Decl            -> VariableDecl | FunctionDecl | ClassDecl | InterfaceDecl
-#VariableDecl    -> Variable;
-#Variable        -> Type ident
-#Type            -> int Type1 | double Type1 | bool Type1 | string Type1 | ident Type1
-#Type1           -> [] Type1 | VAZIO
-#FunctionDecl    -> Type ident ( Formals ) StmtBlock | void ident ( Formals ) StmtBlock
-#Formals         -> Variable (, Variable)* | &
-#ClassDecl       -> class ident (extend ident)? (implements ident (,ident)*)* { Field* }
-#Field           -> VariableDecl | FunctionDecl
-#InterfaceDecl   -> interface ident  { Prototype* }
-#Prototype       -> Type ident (Formals) ; | void ident (Formals) ;
+Progam          -> Decl+
+Decl            -> VariableDecl | FunctionDecl | ClassDecl | InterfaceDecl
+VariableDecl    -> Variable;
+Variable        -> Type ident
+Type            -> int Type1 | double Type1 | bool Type1 | string Type1 | ident Type1
+Type1           -> [] Type1 | VAZIO
+FunctionDecl    -> Type ident ( Formals ) StmtBlock | void ident ( Formals ) StmtBlock
+Formals         -> Variable (, Variable)* | &
+ClassDecl       -> class ident (extend ident)? (implements ident (,ident)*)* { Field* }
+Field           -> VariableDecl | FunctionDecl
+InterfaceDecl   -> interface ident  { Prototype* }
+Prototype       -> Type ident (Formals) ; | void ident (Formals) ;
 StmtBlock       -> { VariableDecl* Stmt* }
 Stmt            -> Expr? | IfStmt | WhileStmt | ForStmt | BreakStmt | ReturnStmt | PrintStmt | StmtBlock
 IfStmt          -> if (Expr) Stmt (else Stmt)*
@@ -36,4 +36,4 @@ LValue          -> ident | Expr F2
 F2              -> .ident | [Expr]
 Call            -> ident ( Actuals ) | Expr .ident | ( Actuals )
 Actuals         -> Expr (, Expr )* | &
-Constant        -> IntConstant | doubleConstant | boolConstatnt | stringConstant | null
+Constant        -> intConstant | doubleConstant | boolConstatnt | stringConstant | null
