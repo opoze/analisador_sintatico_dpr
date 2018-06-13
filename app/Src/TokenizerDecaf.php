@@ -35,15 +35,16 @@ class TokenizerDecaf
       'break',
       'print',
       'this',
-      //'ReadInteger',
-      //'ReadLine',
+      'ReadInteger',
+      'ReadLine',
       'new',
-      //'NewArray'
+      'NewArray'
       'null',
       'intConstant',
       'doubleConstant',
       'boolConstatnt',
-      'stringConstant'
+      'stringConstant',
+      'Print'
     ];
 
     function __construct(){
