@@ -21,7 +21,6 @@ class Controller extends BaseController
 
       $syntaxAnaliser = new SyntaxAnaliser($tokens);
       $syntaxAnaliser->setDebug(true);
-      $syntaxAnaliser->setDebug(true);
       $syntaxAnaliser->start();
 
     }

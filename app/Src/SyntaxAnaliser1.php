@@ -128,26 +128,13 @@ class SyntaxAnaliser
     }
   }
 
-  private function error($ret = false){
-    if($ret){
-      $this->err = true;
-      return;
-    }
+  private function error(){
+    $this->err = true;
     if($this->debug){echo '</br> in error';}
-
-    // if($this->tok == ''){
-    //   if(isset($this->tokens[0]['token'])){
-    //     $tok = $this->tokens[0]['token'];
-    //   }
-    // }
-
-
-    echo '<br>';
-    echo 'Synax Error ';
-    echo 'Unexpected token: \''. $this->tok . '\' ';
-    echo 'in line: \''. $this->line. '\' column: \'' . $this->column . '\'';
-
-    exit();
+    // echo '<br>';
+    // echo 'Synax Error ';
+    // echo 'Unexpected token: \''. $this->tok . '\' ';
+    // echo 'in line: \''. $this->line. '\' column: \'' . $this->column . '\'';
   }
 
   private function Type($ret = false) {
@@ -203,425 +190,503 @@ class SyntaxAnaliser
 
   private function Variable($ret = false) {
     if($this->debug){echo '</br> in Variable';}
-    $this->Type($ret); $this->consume('ID');
+    $this->Type($ret);
+    if($this->err){ return; }
+    $this->consume('ID');
   }
 
   private function VariableDecl($ret = false) {
     if($this->debug){echo '</br> in VariableDecl';}
-    $this->Variable($ret); $this->consume(';');
+    $this->Variable();
+    if($this->err){ return; }
+    $this->consume(';');
   }
 
-  private function Decl($ret = false) {
+  private function Decl() {
     if($this->debug){echo '</br> in Decl';}
-    if($this->isClassDecl()){
-      $this->ClassDecl($ret);
-    }
-    else if($this->isInterfaceDecl()){
-      $this->InterfaceDecl($ret);
-    }
-    else if($this->isFunctionDecl()){
-      $this->FunctionDecl($ret);
-    }
-    else if($this->isVariableDecl()){
-      $this->VariableDecl($ret);
-    }
-    else{
-      $this->error($ret);
+    $this->ClassDecl();
+    if($this->err){
+      $this->err = false;
+      $this->InterfaceDecl();
+      if($thi->err){
+        $this->err = false;
+        $this->FunctionDecl();
+        if($this->err){
+          $this->err = false;
+          $this->VariableDecl();
+        }
+      }
     }
   }
 
-  private function FunctionDecl($ret = false){
+  private function FunctionDecl(){
     if($this->debug){echo '</br> in FunctionDecl';}
-    if ($this->tok == 'void'){
-      $this->consume('void');
+    $this->consume('void');
+    if(!$this->err){
       $this->consume('ID');
-      $this->consume('(');
-      $this->Formals($ret);
-      $this->consume(')');
-      $this->StmtBlock($ret);
-    }
-    else {
-      $this->Type($ret);
-      $this->consume('ID');
-      $this->consume('(');
-      $this->Formals($ret);
-      $this->consume(')');
-      $this->StmtBlock($ret);
-    }
-  }
-
-  private function Formals($ret = false){
-    if($this->debug){echo '</br> in Formals';}
-    if($this->isType()){
-      $this->Variable($ret);
-      $out = false;
-      while(!$out) {
-        if($this->tok == ','){
-          $this->consume(',');
-          $this->Variable($ret);
-        }
-        else{
-          $out = true;
-        }
-      }
-    }
-    // pode ser VAZIO, por isso não gera erro
-  }
-
-
-  private function ClassDecl($ret = false) {
-    if($this->debug){echo '</br> in ClassDecl';}
-    if ($this->isClassDecl()) {
-      $this->consume('class');
-      $this->consume('ID');
-
-      // pode oi não haver um extend ident
-      if($this->tok == 'extend') {
-        $this->consume('extend');
-        $this->consume('ID');
-      }
-
-      // 0 ou N implements, ID
-      $out = false;
-      while(!out){
-        if($this->tok == 'implements') {
-          $this->consume('implements');
-          $this->consume('ID');
-          //0 ou N ,ID
-          $out1 = false;
-          while(!$out1){
-            if($this->tok == ','){
-              $this->consume(',');
-              $this->consume('ID');
-            }
-            else{
-              $out1 = true;
+      if(!$this->err){
+        $this->consume('(');
+        if(!$this->err){
+          $this->Formals();
+          if(!$this->err){
+            $this->consume(')');
+            if(!$this->err){
+              $this->StmtBlock();
             }
           }
         }
-        else{
-          $out = true;
-        }
       }
-
-      $this->consume('{');
-
-      // 0 ou N Field
-      $out = false;
-      while(!$out){
-        if($this->isVariableDecl() || $this->isFunctionDecl()){
-          $this->Field($ret);
-        }
-        else{
-          $out = true;
-        }
-      }
-
-      $this->consume('}');
     }
-    else {
-      $this->error($ret);
+    if($this->err){
+      $this->Type();
+      if(!$this->err){
+        $this->consume('ID');
+        if(!$this->err){
+          $this->consume('(');
+          if(!$this->err){
+            $this->Formals();
+            if(!$this->err){
+              $this->consume(')');
+              if(!$this->err){
+                $this->StmtBlock();
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private function Formals(){
+    if($this->debug){echo '</br> in Formals';}
+
+    $this->Variable();
+    while(!$this->err){
+      $this->consume(',');
+      if(!$this->err){
+        $this->Variable();
+        if($this->err){
+          return;
+        }
+      }
+    }
+
+    // pode ser VAZIO, por isso não gera erro
+    $this->err = false;
+  }
+
+  private function ClassDecl() {
+
+    if($this->debug){echo '</br> in ClassDecl';}
+
+    // Consome ID e class
+    $this->consume('ID');
+    if($this->err){return;}
+    $this->consume('class');
+    if($this->err){return;}
+
+    // Consome exnted e ID
+    $this->consume('extend');
+    if(!$this->err){
+      $this->consume('ID');
+      if($this->err){
+        return;
+      }
+    }
+
+    $this->err = false;
+    while(!$this->err){
+
+      $this->consume('implements');
+      if(!$this->err){
+        $this->consume('ID');
+        if($this->err){
+          return;
+        }
+        else{
+          while(!$this->err){
+            $this->consume(',');
+            if(!$this->err){
+              $this->consume('ID');
+              if($this->err){
+                return;
+              }
+            }
+          }
+        }
+      }
+
+      $this->err = false;
+      $this->consume('{');
+      if($this->err){ return ;}
+
+      while(!$this->err && $this->tok != '}'){
+        $this->Field();
+      }
+
+      if(!$this->err){
+        $this->consume('}');
+      }
+
     }
 
   }
 
-  private function Field($ret = false) {
+  private function Field() {
     if($this->debug){echo '</br> in Field';}
-    if ($this->isVariableDecl()){
-      $this->VariableDecl($ret);
+
+    $this->VariableDecl();
+    if($this->err){
+      $this->err = false;
+      $this->FunctionDecl();
     }
-    else if ($this->isFunctionDecl()){
-      $this->FunctionDecl($ret);
-    }
-    else{
-      $this->error($ret);
-    }
+
   }
 
-  private function InterfaceDecl($ret = false){
+  private function InterfaceDecl(){
     if($this->debug){echo '</br> in InterfaceDecl';}
-    if ($this->isInterfaceDecl()){
-      $this->consume('interface');
-      $this->consume('ID');
-      $this->consume('{');
-      // 0 ou N Prototype
-      $out = false;
-      while(!$out){
-        if($this->isPrototype()){
-          $this->Prototype($ret);
-        }
-        else{
-          $out = true;
-        }
-      }
+
+    $this->consume('interface');
+    if($this->err) { return; }
+    $this->consume('ID');
+    if($this->err) { return; }
+    $this->consume('{');
+    if($this->err) { return; }
+
+    while(!$this->err && $this->tok !=  '}'){
+        $this->Prototype();
+    }
+
+    if(!$this->err){
       $this->consume('}');
     }
-    else{
-      $this->error($ret);
-    }
+
   }
 
-  private function Prototype($ret = false){
+  private function Prototype(){
     if($this->debug){echo '</br> in Prototype';}
-    if($this->tok == 'void'){
-      $this->consume('void');
+
+    $this->consume('void');
+    if(!$this->err){
       $this->consume('ID');
+      if($this->err){ return; }
       $this->consume('(');
-      $this->Formals($ret);
+      if($this->err){ return; }
+      $this->Formals();
+      if($this->err){ return; }
       $this->consume(')');
+      if($this->err){ return; }
       $this->consume(';');
+      if($this->err){ return; }
+
     }
     else{
-      $this->Type($ret);
+      $this->Type();
+      if($this->err){ return; }
       $this->consume('ID');
+      if($this->err){ return; }
       $this->consume('(');
-      $this->Formals($ret);
+      if($this->err){ return; }
+      $this->Formals();
+      if($this->err){ return; }
       $this->consume(')');
+      if($this->err){ return; }
       $this->consume(';');
     }
+
   }
 
-  private function StmtBlock($ret = false){
+  private function StmtBlock(){
     if($this->debug){echo '</br> in StmtBlock';}
+
     $this->consume('{');
-    $out = false;
-    //  0 ou N VariableDecl
-    while(!$out){
-      if($this->isVariableDecl()){
-        $this->VariableDecl($ret);
-      }
-      else{
-        $out = true;
-      }
-    }
-    // 0 ou N Stmt
-    $out = false;
-    while(!$out){
-      if($this->isStmt()){
-        $this->Stmt($ret);
-      }
-      else{
-        $out = true;
+    if($this->err){ return; }
+
+    while(!$this->err && $this->tok != }){
+      $this->VariableDecl();
+      if($this->err){
+        $this->err = false;
+        $this->Stmt();
       }
     }
-    $this->consume('}');
+
+    if(!$this->err){
+      $this->consume('}');
+    }
+
   }
 
-  private function Stmt($ret = false){
+  private function Stmt(){
     if($this->debug){echo '</br> in Stmt';}
-    switch($this->tok){
-      case 'if': {
-        $this->IfStmt($ret);
-        break;
-      }
-      case 'while': {
-        $this->WhileStmt($ret);
-        break;
-      }
-      case 'for': {
-        $this->ForStmt($ret);
-        break;
-      }
-      case 'break': {
-        $this->BreakStmt($ret);
-        break;
-      }
-      case 'return': {
-        $this->ReturnStmt($ret);
-        break;
-      }
-      case 'print': {
-        $this->PrintStmt($ret);
-        break;
-      }
-      case 'if': {
-        $this->ifStmt($ret);
-        break;
-      }
-      case '{': {
-        $this->StmtBlock($ret);
-        break;
-      }
-      default: {
-        // if($this->isExpr()){
-          $this->Expr(true);
+    $this->IfStmt();
+    if($this->err){
+      $this->err = false;
+      $this->WhileStmt();
+      if($this->err){
+        $this->err = false;
+        $this->ForStmt();
+        if($this->err){
+          $this->err = false;
+          $this->BreakStmt();
           if($this->err){
             $this->err = false;
+            $this->ReturnStmt();
+            if($this->err){
+              $this->err = false;
+              $this->PrintStmt();
+              if($this->err){
+                $this->err = false;
+                $this->ifStmt();
+                if($this->err){
+                  $this->err = false;
+                  $this->StmtBlock();
+                  if($this->err){
+                    if($this->tok != ''){
+                      $this->Expr();
+                    }
+                  }
+                }
+              }
+            }
           }
-        // }
-        break;
+        }
       }
     }
   }
 
-  private function IfStmt($ret = false){
+  private function IfStmt(){
     if($this->debug){echo '</br> in IfStmt';}
-    $this->consume('if');
-    $this->consume('(');
-    $this->Expr($ret);
-    $this->consume(')');
-    $this->Stmt($ret);
 
-    // 0 ou N Else
-    $out = false;
-    while(!$out){
-      if($this->token == 'else'){
-        $this->Stmt($ret);
-      }
-      else{
-        $out = true;
+    $this->consume('if');
+    if($this->err){ return; }
+    $this->consume('(');
+    if($this->err){ return; }
+    $this->Expr();
+    if($this->err){ return; }
+    $this->consume(')');
+    if($this->err){ return; }
+    $this->Stmt();
+    if($this->err){ return; }
+
+    while(!$this->err){
+      $this->consume('else');
+      if(!$this->err){
+        $this->Stmt();
+        if($this->err){ return; }
       }
     }
+
+    $this->err = false;
+
   }
 
-  private function WhileStmt($ret = false){
+  private function WhileStmt(){
     if($this->debug){echo '</br> in WhileStmt';}
     $this->consume('(');
+    if($this->err){ return; }
     $this->consume('while');
-    $this->Expr($ret);
+    if($this->err){ return; }
+    $this->Expr();
+    if($this->err){ return; }
     $this->consume(')');
+    if($this->err){ return; }
     $this->StmtBlock();
   }
 
-  private function ForStmt($ret = false){
+  private function ForStmt(){
     if($this->debug){echo '</br> in ForStmt';}
+
     $this->consume('for');
+    if($this->err){ return; }
     $this->consume('(');
-    // 0 ou 1 Expr
-    if($this->isExpr()){ $this->Expr($ret); }
-    $this->consume(';');
-    $this->Expr($ret);
-    $this->consume(';');
-    // 0 ou 1 Expr
-    if($this->isExpr()){ $this->Expr($ret); }
-    $this->consume(')');
-    $this->Stmt($ret);
+    if($this->err){ return;}
+
+    if($this->tok != ';'){
+      $this->Expr();
+      if($this->err) { return; }
+    }
+    else{
+      $this->consume(';');
+      if($this->err) { return; }
+      $this->Expr();
+      if($this->err) { return; }
+      $this->consume(';');
+      if($this->err) { return; }
+      if($this->tok != ')'){
+        $this->Expr();
+        if($this->err) { return; }
+      }
+      else{
+        $this->consume(')');
+        if($this->err) { return; }
+        $this->Stmt();
+      }
+    }
+
   }
 
-  private function ReturnStmt($ret = false) {
+  private function ReturnStmt() {
     if($this->debug){echo '</br> in ReturnStmt';}
     $this->consume('return');
-    // 0 ou 1 Expr
-    if($this->isExpr()){ $this->Expr($ret); }
+    if($this->err){ return; }
+
+    if($this->tok != ''){
+      $this->Expr();
+    }
+
   }
 
-  private function BreakStmt($ret = false) {
+  private function BreakStmt() {
     if($this->debug){echo '</br> in BreakStmt';}
     $this->consume('break');
   }
 
-  private function PrinsStmt($ret = false){
+  private function PrinsStmt(){
     if($this->debug){echo '</br> in PrinsStmt';}
+
     $this->consume('print');
+    if($this->err){ return; }
     $this->consume('(');
-    // 0 ou N Expr
-    $out = false;
-    while(!$out){
-      if($this->isExpr()){
-        $this->Expr($ret);
-      }
-      else{
-        $out = true;
-      }
+    if($this->err){ return; }
+
+    while(!$this->err && $this->tok != ')'){
+      $this->Expr();
     }
-    $this->consume(')');
+
+    if(!$this->err){
+      $this->consume(')');
+    }
+
   }
 
-  private function Expr($ret = false){
+  private function Expr(){
     if($this->debug){echo '</br> in Expr';}
 
-      if($this->tok == 'this') {
-        $this->consume('this');
-        $this->Expr1($ret);
-      }
-      else if($this->tok == '(') {
-       $this->consume('(');
-        $this->Expr($ret);
-        $this->consume(')');
-        $this->Expr1($ret);
-      }
-      else if($this->tok == '-') {
-       $this->consume('-');
-        $this->Expr($ret);
-        $this->Expr1($ret);
-      }
-      else if($this->tok == '!') {
-       $this->consume('!');
-        $this->Expr($ret);
-        $this->Expr1($ret);
-      }
-      else if($this->tok == 'ReadInteger') {
-        $this->consume('ReadInteger');
-        $this->consume('(');
-        $this->consume(')');
-        $this->Expr1($ret);
-      }
-      else if($this->tok == 'ReadLine') {
-        $this->consume('ReadLine');
-        $this->consume('(');
-        $this->consume(')');
-        $this->Expr1($ret);
-      }
-      else if($this->tok == 'new') {
-        $this->consume('ID');
-        $this->Expr1($ret);
-      }
-      else if($this->tok == 'NewArray') {
-        $this->consume('NewArray');
-        $this->consume('(');
-        $this->Expr($ret);
-        $this->Type($ret);
-        $this->consume(')');
-        $this->Expr1($ret);
-      }
-      else if(
-        $this->lexem == 'intConstant' ||
-        $this->lexem == 'doubleConstant' ||
-        $this->lexem == 'boolConstant' ||
-        $this->lexem == 'stringConstant' ||
-        $this->tok == 'null'
-      ){
-        $this->Constant($ret);
-        $this->Expr1($ret);
-      }
-      else{
-
-
-        $this->LValue(false);
-        if($this->err){
-          $this->err = false;
-
-          $this->Call($ret);
-          if($this->err){
-            $this->err = false;
-            $this->error(true);
-          }
-          else{
-            $this->Expr1($ret);
-          }
-        }
-        else{
-          $this->F1($ret);
-        }
-
-      }
-
-  }
-
-  private function F1($ret = false){
-    if($this->debug){echo '</br> in F1';}
-    if($this->tok == '='){
-      $this->consume('=');
-      $this->Expr($ret);
-      $this->Expr1($ret);
+    $this->consume('this');
+    if(!$this->err){
+      $this->Expr1();
+      if($this->err){ return; }
     }
     else{
-      $this->Expr1($ret);
+      $this->consume('(');
+      if(!$this->err){
+        $this->Expr();
+        if($this->err) { return; }
+        $this->consume(')');
+        if($this->err) { return; }
+        $this->Expr1();
+        if($this->err) { return; }
+      }
+      else{
+        $this->consume('-');
+        if(!$this->err){
+          $this->Expr();
+          if($this->err) { return; }
+          $this->Expr1();
+          if($this->err) { return; }
+        }
+        else{
+          $this->consume('!');
+          if(!$this->err){
+            $this->Expr();
+            if($this->err) { return; }
+            $this->Expr1();
+            if($this->err) { return; }
+          }
+          else{
+            $this->consume('ReadInteger');
+            if(!$this->err){
+              $this->consume('(');
+              if($this->err) { return; }
+              $this->consume(')');
+              if($this->err) { return; }
+              $this->Expr1();
+              if($this->err) { return; }
+            }
+            else{
+              $this->consume('ReadLine');
+              if(!$this->err){
+                $this->consume('(');
+                if($this->err) { return; }
+                $this->consume(')');
+                if($this->err) { return; }
+                $this->Expr1();
+                if($this->err) { return; }
+              }
+              else{
+                $this->consume('new');
+                if(!$this->err){
+                  $this->consume('ID');
+                  if($this->err) { return; }
+                  $this->Expr1();
+                  if($this->err) { return; }
+                }
+                else{
+                  $this->consume('NewArray');
+                  if(!$this->err){
+                    $this->consume('(');
+                    if($this->err) { return; }
+                    $this->Expr();
+                    if($this->err) { return; }
+                    $this->Type();
+                    if($this->err) { return; }
+                    $this->consume(')');
+                    if($this->err) { return; }
+                    $this->Expr1();
+                    if($this->err) { return; }
+                  }
+                  else{
+                    $this->Constant();
+                    if(!$this->err){
+                      $this->Expr1();
+                      if($this->err) { return; }
+                    }
+                    else{
+                      $this->LValue();
+                      if(!$this->err){
+                        $this->F1();
+                        if($this->err) { return; }
+                      }
+                      else{
+                        $this->Call();
+                        if(!$this->err){
+                          $this->Expr1();
+                          if($this->err) { return; }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
+  }
+
+  private function F1(){
+    if($this->debug){echo '</br> in F1';}
+
+    $this->consume('=');
+    if(!$this->err){
+      $this->Expr();
+      if($this->err){ return ;}
+      $this->Expr1();
+      if($this->err){ return ;}
+    }
+    else{
+      $this->Expr1();
+      if($this->err){ return ;}
+    }
+
   }
 
   private function Expr1($ret = false){
     if($this->debug){echo '</br> in Expr1';}
+
+    
+
     switch ($this->tok) {
       case '+':{
         $this->consume('+');
@@ -646,9 +711,9 @@ class SyntaxAnaliser
         $this->Expr($ret);
         $this->Expr1($ret);
         break;
+        $this->consume('%');
       }
       case '%':{
-        $this->consume('%');
         $this->Expr($ret);
         $this->Expr1($ret);
         break;
@@ -807,135 +872,3 @@ class SyntaxAnaliser
       }
     }
   }
-
-
-  //  HELPERS
-  private function isType() {
-    if($this->debug){echo '</br> in isType';}
-    return (
-      $this->tok == 'int' ||
-      $this->tok == 'double' ||
-      $this->tok == 'bool' ||
-      $this->tok == 'string' ||
-      $this->lexem == 'ID'
-    );
-  }
-
-  private function isFunctionDecl() {
-    if($this->debug){echo '</br> in isFunctionDecl';}
-    $is = false;
-    if ($this->isType() || $this->tok == 'void'){
-      $indice = $this->indice + 2; // Token 2 a frente;
-      if(isset($this->tokens[$indice])){
-        if($this->tokens[$indice]['token'] == '('){
-          $is = true;
-        }
-      }
-    }
-    return $is;
-  }
-
-  private function isPrototype(){
-    if($this->debug){echo '</br> in isPrototype';}
-    return $this->isFunctionDecl();
-  }
-
-  private function isClassDecl() {
-    if($this->debug){echo '</br> in isClassDecl';}
-    return $this->tok == 'class';
-  }
-
-  private function isVariableDecl(){
-    if($this->debug){echo '</br> in isVariableDecl';}
-    return $this->isVariable();
-  }
-
-  private function isVariable() {
-    if($this->debug){echo '</br> in isVariable';}
-    $is = false;
-    if ($this->isType()){
-      $indice = $this->indice + 2; // Token 2 a frente;
-      if(isset($this->tokens[$indice])){
-        if($this->tokens[$indice]['token'] == ';'){
-          $is = true;
-        }
-      }
-    }
-    return $is;
-  }
-
-  private function isInterfaceDecl() {
-    if($this->debug){echo '</br> in isInterfaceDecl';}
-    return $this->tok == 'interface';
-  }
-
-  private function isIfStmt(){
-    if($this->debug){echo '</br> in isIfStmt';}
-    return $this->tok == 'if';
-  }
-
-  private function isWhileStmt(){
-    if($this->debug){echo '</br> in isWhileStmt';}
-    return $this->tok == 'while';
-  }
-
-  private function isForStmt(){
-    if($this->debug){echo '</br> in isForStmt';}
-    return $this->tok == 'for';
-  }
-
-  private function isReturnStmt(){
-    if($this->debug){echo '</br> in isReturnStmt';}
-    return $this->tok == 'return';
-  }
-
-  private function isBreakStmt(){
-    if($this->debug){echo '</br> in isBreakStmt';}
-    return $this->tok == 'break';
-  }
-
-  private function isStmtBlock(){
-    if($this->debug){echo '</br> in isStmtBlock';}
-    return $this->tok == '{';
-  }
-
-  private function isPrintStmt(){
-    if($this->debug){echo '</br> in isPrintStmt';}
-    return $this->tok == 'print';
-  }
-
-  private function isStmt(){
-    if($this->debug){echo '</br> in isStmt';}
-    return (
-      $this->isIfStmt() ||
-      $this->isWhileStmt() ||
-      $this->isForStmt() ||
-      $this->isBreakStmt() ||
-      $this->isReturnStmt() ||
-      $this->isPrintStmt() ||
-      $this->isExpr() || // Duvida na interrogacao Expr?
-      $this->isStmtBlock()
-    );
-  }
-
-  private function isExpr(){
-    if($this->debug){'</br> in isExpr';}
-    return (
-      $this->tok =='this' ||
-      $this->tok == '-' ||
-      $this->tok == '!' ||
-      $this->tok == 'ReadInteger' ||
-      $this->tok == 'ReadLine' ||
-      $this->tok == 'new' ||
-      $this->tok == 'NewArray' ||
-      $this->tok == '(' ||
-      $this->lexem == 'ID' ||
-      $this->lexem == 'intConstant' ||
-      $this->lexem == 'doubleConstant' ||
-      $this->lexem == 'boolConstant' ||
-      $this->lexem == 'stringConstant' ||
-      $this->tok == 'null'
-    );
-  }
-
-}

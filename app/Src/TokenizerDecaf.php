@@ -71,7 +71,7 @@ class TokenizerDecaf
       if ($handle) {
           while (($line = fgets($handle)) !== false) {
               $this->proccessLine($line);
-              $this->line++; 
+              $this->line++;
           }
           fclose($handle);
           $this->lexemas();
@@ -164,9 +164,9 @@ class TokenizerDecaf
         if($this->context == 'string'){
           if($token=='"'){
             $this->tkns[] = [
-             'lexem' => 'string',
+              'lexem' => 'stringConstant',
               'token' => $string,
-              'line' => $this->tokenInfo[$key]
+              'line' => $this->tokenInfo[$key]['line']
             ];
             $string = '';
             $this->setContext('');
@@ -208,7 +208,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'reserved_word',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -216,7 +216,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'comma',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -224,7 +224,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'semicolon',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -232,7 +232,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'l_cbrace',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -240,31 +240,31 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'r_cbrace',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
-          ];  
+            'line' => $this->tokenInfo[$key]['line']
+          ];
         }
 
         else if($token == '('){
            $this->tkns[] = [
             'lexem' => 'l_parent',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
-          ];  
+            'line' => $this->tokenInfo[$key]['line']
+          ];
         }
 
         else if($token == ')'){
            $this->tkns[] = [
             'lexem' => 'r_parent',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
-          ];  
+            'line' => $this->tokenInfo[$key]['line']
+          ];
         }
 
         else if($token == '<' && $next2 == '>'){
           $this->tkns[] = [
             'lexem' => 'include',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -272,7 +272,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'include',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -280,7 +280,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'include',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -288,7 +288,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'Relat_op',
             'token' => '==',
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
            $pula = true;
         }
@@ -297,7 +297,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'Equal_op',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -305,7 +305,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'Inc_op',
             'token' => '++',
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
           $pula = true;
         }
@@ -314,7 +314,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'Arit_op',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -322,7 +322,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'Arit_op',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -330,7 +330,7 @@ class TokenizerDecaf
            $this->tkns[] = [
             'lexem' => 'Relat_op',
             'token' => '&&',
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
            $pula = true;
         }
@@ -339,7 +339,7 @@ class TokenizerDecaf
            $this->tkns[] = [
             'lexem' => 'Relat_op',
             'token' => '<=',
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
            $pula = true;
         }
@@ -348,7 +348,7 @@ class TokenizerDecaf
            $this->tkns[] = [
             'lexem' => 'Relat_op',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -356,7 +356,7 @@ class TokenizerDecaf
            $this->tkns[] = [
             'lexem' => 'Relat_op',
             'token' => '>=',
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
            $pula = true;
         }
@@ -365,7 +365,7 @@ class TokenizerDecaf
            $this->tkns[] = [
             'lexem' => 'Relat_op',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -373,7 +373,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'l_bracket',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -381,7 +381,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'r_bracket',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -390,7 +390,7 @@ class TokenizerDecaf
            $this->tkns[] = [
             'lexem' => 'Relat_op',
             'token' => '<>',
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
            $pula = true;
         }
@@ -408,7 +408,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'pointer_addr',
             'token' => '&',
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -416,15 +416,39 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'ID',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
         else if (filter_var($token, FILTER_VALIDATE_FLOAT) || $token == '0'){
           $this->tkns[] = [
-            'lexem' => 'num',
+            'lexem' => 'doubleConstant',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
+          ];
+        }
+
+        else if (filter_var($token, FILTER_VALIDATE_INT) || $token == '0'){
+          $this->tkns[] = [
+            'lexem' => 'intConstant',
+            'token' => $token,
+            'line' => $this->tokenInfo[$key]['line']
+          ];
+        }
+
+        else if($token == 'null'){
+          $this->tkns[] = [
+            'lexem' => 'null',
+            'token' => $token,
+            'line' => $this->tokenInfo[$key]['line']
+          ];
+        }
+
+        else if($token == 'true' || $token == 'false'){
+          $this->tkns[] = [
+            'lexem' => 'boolConstant',
+            'token' => $token,
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
@@ -437,14 +461,14 @@ class TokenizerDecaf
             $this->tkns[] = [
               'lexem' => 'Arit_op',
               'token' => $token,
-              'line' => $this->tokenInfo[$key]
+              'line' => $this->tokenInfo[$key]['line']
             ];
           }
           else{
             $this->tkns[] = [
               'lexem' => 'pointer_atrib',
               'token' => $token,
-              'line' => $this->tokenInfo[$key]
+              'line' => $this->tokenInfo[$key]['line']
             ];
           }
 
@@ -453,7 +477,7 @@ class TokenizerDecaf
           $this->tkns[] = [
             'lexem' => 'ID',
             'token' => $token,
-            'line' => $this->tokenInfo[$key]
+            'line' => $this->tokenInfo[$key]['line']
           ];
         }
 
