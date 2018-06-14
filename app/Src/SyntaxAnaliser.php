@@ -4,7 +4,7 @@
  * @Author: Luís Alberto Zagonel Pozenato
  * @Date:   2018-06-13 15:20:48
  * @Last Modified by:   Luís Alberto Zagonel Pozenato
- * @Last Modified time: 2018-06-13 16:53:04
+ * @Last Modified time: 2018-06-14 17:11:26
 
     L =
 
@@ -54,6 +54,7 @@ class SyntaxAnaliser
   private $indice = -1;
   private $debug = false;
   private $line = 0;
+  private $pos = 0;
   private $column = 0;
   private $err = false;
 
@@ -91,6 +92,7 @@ class SyntaxAnaliser
       $this->lexem = $tok['lexem'];
       $this->tok = $tok['token'];
       $this->line = $tok['line'];
+      $this->pos = $tok['pos'];
       $this->column = '0';
     }
     else{
@@ -145,7 +147,7 @@ class SyntaxAnaliser
     echo '<br>';
     echo 'Synax Error ';
     echo 'Unexpected token: \''. $this->tok . '\' ';
-    echo 'in line: \''. $this->line. '\' column: \'' . $this->column . '\'';
+    echo 'in line: \''. $this->line. '\' column: \'' . $this->pos . '\'';
 
     exit();
   }
@@ -587,21 +589,24 @@ class SyntaxAnaliser
       else{
 
 
-        $this->LValue(false);
-        if($this->err){
-          $this->err = false;
 
-          $this->Call($ret);
-          if($this->err){
-            $this->err = false;
-            $this->error(true);
-          }
-          else{
-            $this->Expr1($ret);
-          }
+        if($this->isLvalue()){
+          $this->LValue(); 
+          $this->F1();
         }
+
+        else if($this->isCall()){
+          $this->Call();
+          $this->Expr1();
+        }
+
+        else if($this->isConstant()){
+          $this->Constant();
+          $this->Expr1();
+        }
+
         else{
-          $this->F1($ret);
+          $this->error();
         }
 
       }
@@ -750,14 +755,14 @@ class SyntaxAnaliser
       $this->consume(')');
     }
     else if ($this->token == '('){
-      $this->Expr($ret);
-      $this->consume('.');
-      $this->consume('ID');
-    }
-    else{
       $this->consume('(');
       $this->Actuals($ret);
       $this->consume(')');
+    }
+    else{
+      $this->Expr($ret);
+      $this->consume('.');
+      $this->consume('ID');
     }
   }
 
@@ -935,6 +940,33 @@ class SyntaxAnaliser
       $this->lexem == 'boolConstant' ||
       $this->lexem == 'stringConstant' ||
       $this->tok == 'null'
+    );
+  }
+
+
+  private function isLvalue(){
+    return(
+      $this->lexem == 'ID' ||
+      $this->isExpr()
+    );
+  }
+
+  private function isConstant(){
+    return(
+      $this->lexem == 'intConstant' ||
+      $this->lexem == 'boolConstant' ||
+      $this->lexem == 'doubleConstant' ||
+      $this->lexem == 'stringConstant' ||
+      $this->lexem == 'null' ||
+      $this->isExpr()
+    );
+  }
+
+  private function isCall(){
+    return(
+      $this->lexem == 'ID' ||
+      $this->isExpr() ||
+      $this->token == '(boolConstant)'
     );
   }
 

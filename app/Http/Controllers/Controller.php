@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 use App\Src\TokenizerDecaf;
 use App\Src\SyntaxAnaliser;
+use App\Src\SyntaxAnaliser1;
 
 class Controller extends BaseController
 {
@@ -20,7 +21,7 @@ class Controller extends BaseController
       $tokens = $tokenizer->load('./program.decaf');
 
       $syntaxAnaliser = new SyntaxAnaliser($tokens);
-      $syntaxAnaliser->setDebug(true);
+      $syntaxAnaliser->setDebug();
       $syntaxAnaliser->start();
 
     }

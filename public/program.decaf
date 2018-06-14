@@ -1,4 +1,6 @@
 int qtdComandos;
 void main() {
-  qtdComandos = 4;
+
+    qtdComandos = 4;
+
 }
