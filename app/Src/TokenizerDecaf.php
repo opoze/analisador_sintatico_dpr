@@ -4,7 +4,7 @@
  * @Author: Luís Alberto Zagonel Pozenato
  * @Date:   2018-06-13 15:16:57
  * @Last Modified by:   Luís Alberto Zagonel Pozenato
- * @Last Modified time: 2018-06-14 17:12:58
+ * @Last Modified time: 2018-06-21 14:13:38
  */
 
 namespace App\Src;
@@ -308,7 +308,26 @@ class TokenizerDecaf
            $pula = true;
         }
 
+        else if ($token == '!' && $next1 == '='){
+          $this->tkns[] = [
+            'lexem' => 'Neg_op',
+            'token' => '!=',
+            'line' => $this->tokenInfo[$key]['line'],
+            'pos' => $this->tokenInfo[$key]['pos']
+          ];
+           $pula = true;
+        }
+
         else if ($token == '='){
+          $this->tkns[] = [
+            'lexem' => 'Equal_op',
+            'token' => $token,
+            'line' => $this->tokenInfo[$key]['line'],
+            'pos' => $this->tokenInfo[$key]['pos']
+          ];
+        }
+
+        else if ($token == '!'){
           $this->tkns[] = [
             'lexem' => 'Equal_op',
             'token' => $token,

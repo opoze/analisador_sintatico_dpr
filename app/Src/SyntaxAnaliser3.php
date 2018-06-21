@@ -4,7 +4,7 @@
  * @Author: Luís Alberto Zagonel Pozenato
  * @Date:   2018-06-13 15:20:48
  * @Last Modified by:   Luís Alberto Zagonel Pozenato
- * @Last Modified time: 2018-06-14 16:35:26
+ * @Last Modified time: 2018-06-21 16:27:35
  */
 
 
@@ -145,6 +145,7 @@ class SyntaxAnaliser3
     if(!$this->Type()){
       return false;
     }
+
 
     // Se Não consumir ID retorna false, como não consumiu nada não tem back
     if(!$this->consume('ID')){
@@ -351,31 +352,35 @@ class SyntaxAnaliser3
     $back = 0;
     $this->log(__FUNCTION__);
 
-    // Se Loc
-    if($this->Loc()){
-      if($this->consume('=')){
-        $back++;
-        if($this->Expr()){
-          if(!$this->consume(';')){
+    // Se FuncCall
+    if($this->FuncCall()){
+      if(!$this->consume(';')){
+        return false;
+      }
+    }
+
+    else{
+      ump($this->tok);
+      if($this->Loc()){
+        if($this->consume('=')){
+          $back++;
+          if($this->Expr()){
+            if(!$this->consume(';')){
+              return false;
+            }
+          }
+          else{
+            $this->back($back);
             return false;
           }
         }
         else{
-          $this->back($back);
+          //deve voltar 1 pos loc consome 1
+          $this->back(1);
           return false;
         }
       }
-      else{
-        return false;
-      }
-    }
-    else{
-      // Se FuncCall
-      if($this->FuncCall()){
-        if(!$this->cosume(';')){
-          return false;
-        }
-      }
+
       else{
         // se if
         if($this->consume('if')){
@@ -501,6 +506,7 @@ class SyntaxAnaliser3
   }
 
   private function A(){
+
     $back = 0;
     $this->log(__FUNCTION__);
     // $BINOP = ['=', '+', '-', '*', '/', '%', '<', '>', '<=', '>=', '==', '!=', '&&', '||'];
@@ -629,16 +635,16 @@ class SyntaxAnaliser3
           }
         }
         else{
-          // Se Loc
-          if($this->Loc()){
+          // Se FuncCall
+          if($this->FuncCall()){
             if(!$this->A()){
               $this->back($back); // Não vai ter back
               return false;
             }
           }
           else{
-            // Se FuncCall
-            if($this->FuncCall()){
+            // Se Loc
+            if($this->Loc()){
               if(!$this->A()){
                 $this->back($back); // Não vai ter back
                 return false;
@@ -664,6 +670,7 @@ class SyntaxAnaliser3
   }
 
   private function Type(){
+
     $back = 0;
     $this->log(__FUNCTION__);
 
@@ -679,11 +686,16 @@ class SyntaxAnaliser3
         return true;
     }
 
+    if($this->consume('string')){
+        return true;
+    }
+
     return false;
 
   }
 
   private function Loc(){
+
     $back = 0;
     $this->log(__FUNCTION__);
 
@@ -692,6 +704,7 @@ class SyntaxAnaliser3
     if(!$this->consume('ID')){
       return false;
     }
+
 
     $back++;
 

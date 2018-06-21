@@ -23,7 +23,7 @@ class Controller extends BaseController
 
     public function show(TokenizerDecaf $tokenizer) {
 
-      $tokens = $tokenizer->load('./program.decaf');
+      $tokens = $tokenizer->load('./program1.decaf');
 
       $syntaxAnaliser = new SyntaxAnaliser3($tokens);
       $syntaxAnaliser->setDebug(true);
