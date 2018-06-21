@@ -28,32 +28,17 @@ class TokenizerDecaf
 
     private $reservedWords = [
       'int',
-      'double',
       'bool',
-      'string',
       'void',
-      'class',
-      'extend',
-      'implements',
-      'interface',
+      'def',
       'if',
       'else',
       'while',
-      'for',
       'return',
       'break',
-      'print',
-      'this',
-      'ReadInteger',
-      'ReadLine',
-      'new',
-      'NewArray',
-      'null',
-      'intConstant',
-      'doubleConstant',
-      'boolConstatnt',
-      'stringConstant',
-      'Print'
+      'continue',
+      // 'true',
+      // 'false',
     ];
 
     function __construct(){

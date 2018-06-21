@@ -653,6 +653,8 @@ class SyntaxAnaliser1
                     if($this->err) { return; }
                     $this->Expr();
                     if($this->err) { return; }
+                    $this->consume(',');
+                    if($this->err) { return; }
                     $this->Type();
                     if($this->err) { return; }
                     $this->consume(')');
@@ -710,7 +712,7 @@ class SyntaxAnaliser1
   private function Expr1(){
     if($this->debug){echo '</br> in Expr1';}
 
-    
+
 
     switch ($this->tok) {
       case '+':{

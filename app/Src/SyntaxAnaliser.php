@@ -537,18 +537,18 @@ class SyntaxAnaliser
         $this->Expr1($ret);
       }
       else if($this->tok == '(') {
-       $this->consume('(');
+        $this->consume('(');
         $this->Expr($ret);
         $this->consume(')');
         $this->Expr1($ret);
       }
       else if($this->tok == '-') {
-       $this->consume('-');
+        $this->consume('-');
         $this->Expr($ret);
         $this->Expr1($ret);
       }
       else if($this->tok == '!') {
-       $this->consume('!');
+        $this->consume('!');
         $this->Expr($ret);
         $this->Expr1($ret);
       }
@@ -572,6 +572,7 @@ class SyntaxAnaliser
         $this->consume('NewArray');
         $this->consume('(');
         $this->Expr($ret);
+        $this->consume(',');
         $this->Type($ret);
         $this->consume(')');
         $this->Expr1($ret);
@@ -591,7 +592,7 @@ class SyntaxAnaliser
 
 
         if($this->isLvalue()){
-          $this->LValue(); 
+          $this->LValue();
           $this->F1();
         }
 
@@ -716,16 +717,29 @@ class SyntaxAnaliser
 
   private function LValue($ret = false){
     if($this->debug){echo '</br> in LValue';}
+
+    // $indice = $this->indice + 1; // Token 2 a frente;
+    //
+    // $is = false;
+    // if(isset($this->tokens[$indice])){
+    //   if($this->tokens[$indice]['token'] == '['){
+    //     $is = true;
+    //   }
+    // }
+
     if($this->lexem == 'ID'){
       $this->consume('ID');
     }
+
     else{
-      $this->Expr($ret);
-      $this->F2($ret);
+      $this->consume('ID');
+      $this->Expr();
+      $this->F2();
     }
+
   }
 
-  private function F2($ret = false){
+  private function F2(){
     if($this->debug){echo '</br> in F2';}
     switch ($this->tok) {
       case '.': {
@@ -735,32 +749,32 @@ class SyntaxAnaliser
       }
       case '[': {
         $this->consume('[');
-        $this->Expr($ret);
+        $this->Expr();
         $this->consume(']');
         break;
       }
       default: {
-        $this->error($ret);
+        $this->error();
         break;
       }
     }
   }
 
-  private function Call($ret = false){
+  private function Call(){
     if($this->debug){echo '</br> in Call';}
     if($this->lexem == 'ID'){
       $this->consume('ID');
       $this->consume('(');
-      $this->Actuals($ret);
+      $this->Actuals();
       $this->consume(')');
     }
     else if ($this->token == '('){
       $this->consume('(');
-      $this->Actuals($ret);
+      $this->Actuals();
       $this->consume(')');
     }
     else{
-      $this->Expr($ret);
+      $this->Expr();
       $this->consume('.');
       $this->consume('ID');
     }
@@ -784,7 +798,7 @@ class SyntaxAnaliser
     // pode ser VAZIO então não da erro caso não seja Expr
   }
 
-  private function Constant($ret = false){
+  private function Constant(){
     if($this->debug){echo '</br> in Constant';}
     switch($this->lexem){
       case 'intConstant': {
@@ -857,15 +871,32 @@ class SyntaxAnaliser
 
   private function isVariable() {
     if($this->debug){echo '</br> in isVariable';}
+
+    // return $this->isType();
+
     $is = false;
+
+
     if ($this->isType()){
+
+
       $indice = $this->indice + 2; // Token 2 a frente;
+
       if(isset($this->tokens[$indice])){
         if($this->tokens[$indice]['token'] == ';'){
           $is = true;
         }
       }
+
+      $indice = $this->indice + 1; // Token 2 a frente;
+      if(isset($this->tokens[$indice])){
+        if($this->tokens[$indice]['token'] == '['){
+          $is = true;
+        }
+      }
+
     }
+
     return $is;
   }
 
@@ -943,11 +974,16 @@ class SyntaxAnaliser
     );
   }
 
+  // private function isExpr1(){
+  //   $this->isExpr() ||
+  // }
+
 
   private function isLvalue(){
     return(
-      $this->lexem == 'ID' ||
-      $this->isExpr()
+      $this->lexem == 'ID'
+      // ||
+      // $this->isExpr()
     );
   }
 
@@ -957,8 +993,8 @@ class SyntaxAnaliser
       $this->lexem == 'boolConstant' ||
       $this->lexem == 'doubleConstant' ||
       $this->lexem == 'stringConstant' ||
-      $this->lexem == 'null' ||
-      $this->isExpr()
+      $this->lexem == 'null'
+      //$this->isExpr()
     );
   }
 
@@ -966,7 +1002,7 @@ class SyntaxAnaliser
     return(
       $this->lexem == 'ID' ||
       $this->isExpr() ||
-      $this->token == '(boolConstant)'
+      $this->token = '(boolConstant)'
     );
   }
 

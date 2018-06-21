@@ -1,6 +1,6 @@
-int qtdComandos;
-void main() {
+int teste[10];
 
-    qtdComandos = 4;
+def int milhopan(int a, int b){
 
+a = 10;
 }

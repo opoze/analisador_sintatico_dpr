@@ -12,6 +12,11 @@ use App\Src\TokenizerDecaf;
 use App\Src\SyntaxAnaliser;
 use App\Src\SyntaxAnaliser1;
 
+
+use App\Src\SyntaxAnaliser3;
+
+
+
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
@@ -20,8 +25,8 @@ class Controller extends BaseController
 
       $tokens = $tokenizer->load('./program.decaf');
 
-      $syntaxAnaliser = new SyntaxAnaliser($tokens);
-      $syntaxAnaliser->setDebug();
+      $syntaxAnaliser = new SyntaxAnaliser3($tokens);
+      $syntaxAnaliser->setDebug(true);
       $syntaxAnaliser->start();
 
     }
